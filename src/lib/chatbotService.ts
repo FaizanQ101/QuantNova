@@ -1,5 +1,5 @@
 import { findRelevantDocuments, buildContext, type KnowledgeDocument } from '@/data/knowledgeBase';
-import { CONFIG, isApiKeyConfigured } from './config';
+import { CONFIG } from './config';
 
 export interface ChatMessage {
   id: string;
@@ -120,23 +120,6 @@ class ChatbotService {
     const relevantDocs = findRelevantDocuments(userMessage, CONFIG.CHATBOT.TOP_K_RETRIEVAL);
     const context = buildContext(relevantDocs);
 
-    // If API key is not configured, use fallback responses
-    if (!isApiKeyConfigured()) {
-      const fallback = this.getFallbackResponse(userMessage);
-      
-      const assistantMsg: ChatMessage = {
-        id: this.generateId(),
-        role: 'assistant',
-        content: fallback.message,
-        timestamp: new Date(),
-        sources: fallback.sources
-      };
-      this.conversationHistory.push(assistantMsg);
-      this.saveHistory();
-      
-      return fallback;
-    }
-
     try {
       // Build messages for API
       const messages = [
@@ -147,12 +130,11 @@ class ChatbotService {
         }))
       ];
 
-      // Call Kimi API
-      const response = await fetch(`${CONFIG.KIMI_API_BASE_URL}/chat/completions`, {
+      // Call server-side API route (keeps API key off the client)
+      const response = await fetch(`/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${CONFIG.KIMI_API_KEY}`
         },
         body: JSON.stringify({
           model: CONFIG.KIMI_MODEL,

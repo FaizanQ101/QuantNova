@@ -26,7 +26,8 @@ Open `src/lib/config.ts` and replace the placeholder:
 
 ```typescript
 export const CONFIG = {
-  KIMI_API_KEY: 'YOUR_ACTUAL_API_KEY_HERE', // Replace this
+  // IMPORTANT: Never put KIMI_API_KEY in client code.
+  // Configure it as a server environment variable on Vercel instead.
   // ... rest of config
 };
 ```

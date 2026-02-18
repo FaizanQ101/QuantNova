@@ -1,10 +1,6 @@
-// Configuration file for QuantNova
-// Replace the placeholder with your actual Kimi API key
-
 export const CONFIG = {
-  // Kimi API Configuration
-  // Get your API key from: https://platform.moonshot.cn/
-  KIMI_API_KEY: 'sk-VmDVFj89F4qo6ZjyZogqVYKPdhiBXo46eTEKhRtRq5aVPiMH',
+  // Kimi API Configuration (SERVER-SIDE ONLY)
+  // Do not put API keys in client code. The app calls `/api/chat` (Vercel function) instead.
   KIMI_API_BASE_URL: 'https://api.moonshot.cn/v1',
   KIMI_MODEL: 'moonshot-v1-8k', // Options: moonshot-v1-8k, moonshot-v1-32k, moonshot-v1-128k
   
@@ -24,8 +20,4 @@ export const CONFIG = {
   }
 };
 
-// Helper to check if API key is configured
-export function isApiKeyConfigured(): boolean {
-  return CONFIG.KIMI_API_KEY !== 'YOUR_KIMI_API_KEY_HERE' && 
-         CONFIG.KIMI_API_KEY.length > 0;
-}
+// The Kimi API key must be configured as a SERVER env var on Vercel: `KIMI_API_KEY`.

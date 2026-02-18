@@ -1,6 +1,9 @@
 -- Supabase Database Schema for Contact Form Submissions
 -- Run this SQL in your Supabase SQL Editor to create the table
 
+-- Needed for gen_random_uuid()
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- Create the contact_submissions table
 CREATE TABLE IF NOT EXISTS contact_submissions (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,

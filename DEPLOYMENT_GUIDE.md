@@ -67,6 +67,7 @@ This guide will walk you through deploying your website to Vercel and setting up
    |------|-------|
    | `VITE_SUPABASE_URL` | Your Supabase Project URL |
    | `VITE_SUPABASE_ANON_KEY` | Your Supabase anon/public key |
+   | `KIMI_API_KEY` | Your Moonshot/Kimi API key (server-side only) |
 
 7. Click "Deploy"
 8. Wait for deployment to complete (usually 1-2 minutes)

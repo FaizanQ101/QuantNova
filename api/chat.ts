@@ -4,6 +4,17 @@
 type ChatCompletionMessage = { role: 'system' | 'user' | 'assistant'; content: string };
 
 export default async function handler(req: any, res: any) {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   try {
     if (req.method !== 'POST') {
       res.status(405).json({ error: { message: 'Method not allowed' } });
@@ -11,8 +22,16 @@ export default async function handler(req: any, res: any) {
     }
 
     const apiKey = process.env.KIMI_API_KEY;
+    console.log('API Key check:', apiKey ? 'Present' : 'Missing');
+    console.log('Available env vars:', Object.keys(process.env).filter(k => k.includes('KIMI')));
+    
     if (!apiKey) {
-      res.status(500).json({ error: { message: 'Missing KIMI_API_KEY server env var' } });
+      console.error('KIMI_API_KEY is missing from environment variables');
+      res.status(500).json({ 
+        error: { 
+          message: 'Missing KIMI_API_KEY server env var. Please add it in Vercel project settings and redeploy.' 
+        } 
+      });
       return;
     }
 

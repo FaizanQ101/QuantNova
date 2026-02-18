@@ -146,7 +146,14 @@ class ChatbotService {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || `API error: ${response.status}`);
+        const errorMessage = errorData.error?.message || `API error: ${response.status}`;
+        console.error('Chatbot API error:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData,
+          url: response.url
+        });
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();

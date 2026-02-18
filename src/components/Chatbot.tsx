@@ -12,7 +12,6 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { chatbotService, type ChatMessage } from '@/lib/chatbotService';
-import { isApiKeyConfigured } from '@/lib/config';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 const Chatbot = () => {
@@ -21,16 +20,15 @@ const Chatbot = () => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showTyping, setShowTyping] = useState(false);
-  const [apiConfigured, setApiConfigured] = useState(false);
+  const [apiConfigured] = useState(true); // API is handled server-side via /api/chat
   
   const chatWindowRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // Check API configuration on mount
+  // Load chat history on mount
   useEffect(() => {
-    setApiConfigured(isApiKeyConfigured());
     setMessages(chatbotService.getHistory());
   }, []);
 

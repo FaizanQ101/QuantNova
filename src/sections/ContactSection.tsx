@@ -81,7 +81,7 @@ const ContactSection = () => {
 
     try {
       // Submit to Supabase
-      const { data, error: supabaseError } = await supabase
+      const { error: supabaseError } = await supabase
         .from(FORM_SUBMISSIONS_TABLE)
         .insert([
           {
@@ -91,8 +91,7 @@ const ContactSection = () => {
             message: formData.message,
             created_at: new Date().toISOString(),
           },
-        ])
-        .select();
+        ]);
 
       if (supabaseError) {
         throw supabaseError;

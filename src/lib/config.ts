@@ -2,7 +2,7 @@ export const CONFIG = {
   // Kimi API Configuration (SERVER-SIDE ONLY)
   // Do not put API keys in client code. The app calls `/api/chat` (Vercel function) instead.
   KIMI_API_BASE_URL: 'https://api.moonshot.cn/v1',
-  KIMI_MODEL: 'moonshot-v1-8k', // Options: moonshot-v1-8k, moonshot-v1-32k, moonshot-v1-128k
+  KIMI_MODEL: 'moonshot-v1-32k', // Options: moonshot-v1-8k, moonshot-v1-32k, moonshot-v1-128k
   
   // Chatbot Configuration
   CHATBOT: {

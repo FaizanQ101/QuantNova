@@ -1,4 +1,4 @@
-import { useRef, useLayoutEffect } from 'react';
+import { useRef, useLayoutEffect, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, TrendingDown, Clock, Shield } from 'lucide-react';
@@ -33,8 +33,19 @@ const CaseStudiesSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const checkMotion = () => setPrefersReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    checkMotion();
+  }, []);
 
   useLayoutEffect(() => {
+    if (prefersReducedMotion) {
+      gsap.set([headerRef.current, cardsRef.current?.querySelectorAll('.case-card') || []], { opacity: 1, y: 0 });
+      return;
+    }
+
     const section = sectionRef.current;
     if (!section) return;
 
@@ -42,15 +53,15 @@ const CaseStudiesSection = () => {
       // Header animation
       gsap.fromTo(
         headerRef.current,
-        { y: 40, opacity: 0 },
+        { y: 30, opacity: 0 },
         {
           y: 0,
           opacity: 1,
-          duration: 0.8,
+          duration: 0.6,
           ease: 'power2.out',
           scrollTrigger: {
             trigger: headerRef.current,
-            start: 'top 80%',
+            start: 'top 85%',
             toggleActions: 'play none none reverse',
           },
         }
@@ -62,12 +73,11 @@ const CaseStudiesSection = () => {
         cards.forEach((card) => {
           gsap.fromTo(
             card,
-            { y: 80, opacity: 0, scale: 0.98 },
+            { y: 50, opacity: 0 },
             {
               y: 0,
               opacity: 1,
-              scale: 1,
-              duration: 0.8,
+              duration: 0.6,
               ease: 'power2.out',
               scrollTrigger: {
                 trigger: card,
@@ -77,30 +87,32 @@ const CaseStudiesSection = () => {
             }
           );
 
-          // Parallax for image inside card
-          const img = card.querySelector('.card-image');
-          if (img) {
-            gsap.fromTo(
-              img,
-              { y: -12 },
-              {
-                y: 12,
-                ease: 'none',
-                scrollTrigger: {
-                  trigger: card,
-                  start: 'top bottom',
-                  end: 'bottom top',
-                  scrub: true,
-                },
-              }
-            );
+          // Simplified parallax for desktop
+          if (window.innerWidth >= 1024) {
+            const img = card.querySelector('.card-image');
+            if (img) {
+              gsap.fromTo(
+                img,
+                { y: -8 },
+                {
+                  y: 8,
+                  ease: 'none',
+                  scrollTrigger: {
+                    trigger: card,
+                    start: 'top bottom',
+                    end: 'bottom top',
+                    scrub: true,
+                  },
+                }
+              );
+            }
           }
         });
       }
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   const scrollToContact = () => {
     const element = document.querySelector('#contact');
@@ -113,22 +125,22 @@ const CaseStudiesSection = () => {
     <section
       ref={sectionRef}
       id="work"
-      className="section-flowing z-[104] bg-[#070B14] py-[10vh] px-[7vw]"
+      className="relative z-[4] bg-[#070B14] py-16 sm:py-20 lg:py-[10vh] px-4 sm:px-6 lg:px-[7vw]"
     >
       {/* Header */}
-      <div ref={headerRef} className="max-w-[52vw] mb-12" style={{ opacity: 0 }}>
-        <span className="eyebrow block mb-4">SELECTED WORK</span>
-        <h2 className="text-[clamp(32px,3.6vw,52px)] font-bold text-[#F4F6FF] leading-[1.0] mb-4">
+      <div ref={headerRef} className="max-w-full lg:max-w-[52vw] mb-8 sm:mb-12" style={{ opacity: 0 }}>
+        <span className="eyebrow block mb-3 sm:mb-4">SELECTED WORK</span>
+        <h2 className="text-[clamp(26px,5vw,52px)] sm:text-[clamp(32px,3.6vw,52px)] font-bold text-[#F4F6FF] leading-[1.0] mb-3 sm:mb-4">
           Systems we've shipped.
         </h2>
       </div>
 
       {/* Case Study Cards */}
-      <div ref={cardsRef} className="flex flex-col gap-8">
+      <div ref={cardsRef} className="flex flex-col gap-6 sm:gap-8">
         {caseStudies.map((study, index) => (
           <div
             key={index}
-            className="case-card relative h-[50vh] min-h-[400px] max-h-[500px] rounded-[28px] overflow-hidden group cursor-pointer transition-transform duration-300 hover:-translate-y-2"
+            className="case-card relative h-[350px] sm:h-[45vh] sm:min-h-[400px] sm:max-h-[500px] rounded-2xl sm:rounded-[28px] overflow-hidden group cursor-pointer touch-pan-y"
             style={{ opacity: 0 }}
           >
             {/* Background Image */}
@@ -136,30 +148,32 @@ const CaseStudiesSection = () => {
               <img
                 src={study.image}
                 alt={study.title}
-                className="card-image w-full h-[calc(100%+24px)] object-cover transition-transform duration-700 group-hover:scale-105"
+                className="card-image w-full h-[calc(100%+16px)] sm:h-[calc(100%+24px)] object-cover transition-transform duration-500 group-hover:scale-105 gpu-accelerate"
+                loading="lazy"
+                decoding="async"
               />
             </div>
 
             {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#070B14] via-[#070B14]/50 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#070B14] via-[#070B14]/60 to-transparent" />
 
             {/* Content */}
-            <div className="absolute bottom-0 left-0 right-0 p-8">
-              <div className="glass-panel inline-flex items-center gap-3 px-4 py-3 mb-4">
-                <study.icon className="w-5 h-5 text-[#4F6DFF]" />
-                <span className="text-sm font-medium text-[#F4F6FF]">
+            <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8">
+              <div className="glass-panel inline-flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 mb-3 sm:mb-4">
+                <study.icon className="w-4 h-4 sm:w-5 sm:h-5 text-[#4F6DFF]" />
+                <span className="text-xs sm:text-sm font-medium text-[#F4F6FF] truncate max-w-[200px] sm:max-w-none">
                   {study.result}
                 </span>
               </div>
               <div className="flex items-end justify-between">
-                <div>
-                  <span className="eyebrow block mb-2">{study.industry}</span>
-                  <h3 className="text-2xl md:text-3xl font-semibold text-[#F4F6FF]">
+                <div className="flex-1 min-w-0">
+                  <span className="eyebrow block mb-1 sm:mb-2">{study.industry}</span>
+                  <h3 className="text-lg sm:text-2xl lg:text-3xl font-semibold text-[#F4F6FF] truncate">
                     {study.title}
                   </h3>
                 </div>
-                <div className="w-12 h-12 rounded-full bg-[#4F6DFF] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <ArrowRight className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#4F6DFF] flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300 flex-shrink-0 ml-4">
+                  <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </div>
               </div>
             </div>
@@ -168,8 +182,8 @@ const CaseStudiesSection = () => {
       </div>
 
       {/* CTA */}
-      <div className="mt-12">
-        <button onClick={scrollToContact} className="btn-secondary">
+      <div className="mt-8 sm:mt-12">
+        <button onClick={scrollToContact} className="btn-secondary w-full sm:w-auto">
           Request a portfolio walkthrough
           <ArrowRight size={18} />
         </button>

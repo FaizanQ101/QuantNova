@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navigation from './components/Navigation';
@@ -17,9 +17,23 @@ gsap.registerPlugin(ScrollTrigger);
 
 function App() {
   const mainRef = useRef<HTMLElement>(null);
-  const snapTriggerRef = useRef<ScrollTrigger | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
+  // Detect mobile for conditional snap behavior
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile, { passive: true });
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Global snap scroll - DISABLED on mobile for better UX
+  useEffect(() => {
+    if (isMobile) return; // Skip snap on mobile
+
     // Wait for all sections to mount and create their ScrollTriggers
     const timer = setTimeout(() => {
       const pinned = ScrollTrigger.getAll()
@@ -38,13 +52,13 @@ function App() {
           (st.start + ((st.end ?? st.start) - st.start) * 0.5) / maxScroll,
       }));
 
-      // Create global snap
-      snapTriggerRef.current = ScrollTrigger.create({
+      // Create global snap with reduced intensity for smoother feel
+      ScrollTrigger.create({
         snap: {
           snapTo: (value: number) => {
             // Check if within any pinned range (with small buffer)
             const inPinned = pinnedRanges.some(
-              (r) => value >= r.start - 0.02 && value <= r.end + 0.02
+              (r) => value >= r.start - 0.03 && value <= r.end + 0.03
             );
 
             if (!inPinned) return value; // flowing section: free scroll
@@ -60,7 +74,7 @@ function App() {
 
             return target;
           },
-          duration: { min: 0.15, max: 0.35 },
+          duration: { min: 0.1, max: 0.25 },
           delay: 0,
           ease: 'power2.out',
         },
@@ -69,11 +83,8 @@ function App() {
 
     return () => {
       clearTimeout(timer);
-      if (snapTriggerRef.current) {
-        snapTriggerRef.current.kill();
-      }
     };
-  }, []);
+  }, [isMobile]);
 
   // Cleanup all ScrollTriggers on unmount
   useEffect(() => {
@@ -84,15 +95,15 @@ function App() {
 
   return (
     <>
-      {/* Grain Overlay */}
-      <div className="grain-overlay" />
+      {/* Grain Overlay - hidden on mobile */}
+      <div className="grain-overlay hidden sm:block" />
 
       {/* Navigation */}
       <Navigation />
 
       {/* Main Content */}
       <main ref={mainRef} className="relative">
-        {/* Pinned Sections (z-index stacking) */}
+        {/* Pinned Sections - disabled on mobile */}
         <HeroSection />
         <ApproachSection />
         <ResultsSection />

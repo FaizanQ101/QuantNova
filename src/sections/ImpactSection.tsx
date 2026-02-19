@@ -1,4 +1,4 @@
-import { useRef, useLayoutEffect, useState, useEffect } from 'react';
+import { useRef, useLayoutEffect, useEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Quote } from 'lucide-react';
@@ -25,7 +25,7 @@ const AnimatedNumber = ({
   useEffect(() => {
     if (!isVisible) return;
 
-    const duration = 2000;
+    const duration = 1500;
     const startTime = Date.now();
     const startValue = 0;
 
@@ -64,8 +64,20 @@ const ImpactSection = () => {
   const metricsRef = useRef<HTMLDivElement>(null);
   const testimonialRef = useRef<HTMLDivElement>(null);
   const [metricsVisible, setMetricsVisible] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const checkMotion = () => setPrefersReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    checkMotion();
+  }, []);
 
   useLayoutEffect(() => {
+    if (prefersReducedMotion) {
+      gsap.set([headerRef.current, metricsRef.current?.querySelectorAll('.metric-item') || [], testimonialRef.current], { opacity: 1, y: 0, x: 0 });
+      setMetricsVisible(true);
+      return;
+    }
+
     const section = sectionRef.current;
     if (!section) return;
 
@@ -73,15 +85,15 @@ const ImpactSection = () => {
       // Header animation
       gsap.fromTo(
         headerRef.current,
-        { y: 40, opacity: 0 },
+        { y: 30, opacity: 0 },
         {
           y: 0,
           opacity: 1,
-          duration: 0.8,
+          duration: 0.6,
           ease: 'power2.out',
           scrollTrigger: {
             trigger: headerRef.current,
-            start: 'top 80%',
+            start: 'top 85%',
             toggleActions: 'play none none reverse',
           },
         }
@@ -90,16 +102,16 @@ const ImpactSection = () => {
       // Metrics animation
       gsap.fromTo(
         metricsRef.current?.querySelectorAll('.metric-item') || [],
-        { y: 40, opacity: 0 },
+        { y: 30, opacity: 0 },
         {
           y: 0,
           opacity: 1,
-          duration: 0.7,
-          stagger: 0.12,
+          duration: 0.5,
+          stagger: 0.08,
           ease: 'power2.out',
           scrollTrigger: {
             trigger: metricsRef.current,
-            start: 'top 75%',
+            start: 'top 80%',
             toggleActions: 'play none none reverse',
             onEnter: () => setMetricsVisible(true),
           },
@@ -109,15 +121,15 @@ const ImpactSection = () => {
       // Testimonial animation
       gsap.fromTo(
         testimonialRef.current,
-        { x: 60, opacity: 0 },
+        { y: 30, opacity: 0 },
         {
-          x: 0,
+          y: 0,
           opacity: 1,
-          duration: 0.8,
+          duration: 0.6,
           ease: 'power2.out',
           scrollTrigger: {
             trigger: testimonialRef.current,
-            start: 'top 75%',
+            start: 'top 80%',
             toggleActions: 'play none none reverse',
           },
         }
@@ -125,33 +137,33 @@ const ImpactSection = () => {
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion]);
 
   return (
     <section
       ref={sectionRef}
-      className="section-flowing z-[106] bg-[#0B1220] py-[10vh] px-[7vw]"
+      className="relative z-[6] bg-[#0B1220] py-16 sm:py-20 lg:py-[10vh] px-4 sm:px-6 lg:px-[7vw]"
     >
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-12 lg:gap-16">
         {/* Left Column - Metrics */}
         <div>
           {/* Header */}
-          <div ref={headerRef} className="mb-10" style={{ opacity: 0 }}>
-            <span className="eyebrow block mb-4">IMPACT</span>
-            <h2 className="text-[clamp(32px,3.6vw,52px)] font-bold text-[#F4F6FF] leading-[1.0]">
+          <div ref={headerRef} className="mb-8 sm:mb-10" style={{ opacity: 0 }}>
+            <span className="eyebrow block mb-3 sm:mb-4">IMPACT</span>
+            <h2 className="text-[clamp(26px,5vw,52px)] sm:text-[clamp(32px,3.6vw,52px)] font-bold text-[#F4F6FF] leading-[1.0]">
               Built for reliability.
             </h2>
           </div>
 
           {/* Metrics */}
-          <div ref={metricsRef} className="space-y-8">
+          <div ref={metricsRef} className="space-y-6 sm:space-y-8">
             {metrics.map((metric, index) => (
               <div
                 key={index}
-                className="metric-item flex items-baseline gap-4"
+                className="metric-item flex items-baseline gap-3 sm:gap-4"
                 style={{ opacity: 0 }}
               >
-                <span className="text-[clamp(48px,5vw,72px)] font-bold text-[#4F6DFF] leading-none">
+                <span className="text-[clamp(40px,8vw,72px)] sm:text-[clamp(48px,5vw,72px)] font-bold text-[#4F6DFF] leading-none">
                   <AnimatedNumber
                     value={metric.value}
                     suffix={metric.suffix}
@@ -159,8 +171,8 @@ const ImpactSection = () => {
                   />
                 </span>
                 <div className="flex flex-col">
-                  <span className="text-[#A7B1D8] text-sm">{metric.label}</span>
-                  <span className="text-[#F4F6FF] font-medium">
+                  <span className="text-[#A7B1D8] text-xs sm:text-sm">{metric.label}</span>
+                  <span className="text-[#F4F6FF] font-medium text-sm sm:text-base">
                     {metric.sublabel}
                   </span>
                 </div>
@@ -172,23 +184,25 @@ const ImpactSection = () => {
         {/* Right Column - Testimonial */}
         <div
           ref={testimonialRef}
-          className="glass-panel p-8 lg:p-10 flex flex-col justify-center"
+          className="glass-panel p-6 sm:p-8 lg:p-10 flex flex-col justify-center"
           style={{ opacity: 0 }}
         >
-          <Quote className="w-10 h-10 text-[#4F6DFF] mb-6" />
-          <blockquote className="text-xl lg:text-2xl text-[#F4F6FF] leading-relaxed mb-8">
+          <Quote className="w-8 h-8 sm:w-10 sm:h-10 text-[#4F6DFF] mb-4 sm:mb-6" />
+          <blockquote className="text-lg sm:text-xl lg:text-2xl text-[#F4F6FF] leading-relaxed mb-6 sm:mb-8">
             "QuantNova turned a messy prototype into a production-grade
             forecasting tool in weeks—not months."
           </blockquote>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <img
               src="/images/testimonial_avatar.jpg"
               alt="Elena Voss"
-              className="w-14 h-14 rounded-full object-cover"
+              className="w-12 h-12 sm:w-14 sm:h-14 rounded-full object-cover"
+              loading="lazy"
+              decoding="async"
             />
             <div>
-              <p className="font-semibold text-[#F4F6FF]">Elena Voss</p>
-              <p className="text-sm text-[#A7B1D8]">VP Product, Northpeak</p>
+              <p className="font-semibold text-[#F4F6FF] text-sm sm:text-base">Elena Voss</p>
+              <p className="text-xs sm:text-sm text-[#A7B1D8]">VP Product, Northpeak</p>
             </div>
           </div>
         </div>

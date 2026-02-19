@@ -1,4 +1,4 @@
-import { useEffect, useRef, useLayoutEffect } from 'react';
+import { useEffect, useRef, useLayoutEffect, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowRight, ChevronRight } from 'lucide-react';
@@ -10,12 +10,39 @@ const HeroSection = () => {
   const textBlockRef = useRef<HTMLDivElement>(null);
   const imageCardRef = useRef<HTMLDivElement>(null);
   const bgRef = useRef<HTMLDivElement>(null);
-  const orb1Ref = useRef<HTMLDivElement>(null);
-  const orb2Ref = useRef<HTMLDivElement>(null);
-  const orb3Ref = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  // Check for mobile and reduced motion preference
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || 'ontouchstart' in window);
+    };
+
+    const checkMotion = () => {
+      setPrefersReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    };
+
+    checkMobile();
+    checkMotion();
+
+    window.addEventListener('resize', checkMobile, { passive: true });
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Auto-play entrance animation on load
   useEffect(() => {
+    if (prefersReducedMotion) {
+      // Skip animations, show content immediately
+      gsap.set([bgRef.current, textBlockRef.current, imageCardRef.current], {
+        opacity: 1,
+        x: 0,
+        y: 0,
+        scale: 1,
+      });
+      return;
+    }
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
 
@@ -23,40 +50,38 @@ const HeroSection = () => {
       tl.fromTo(
         bgRef.current,
         { opacity: 0, scale: 1.06 },
-        { opacity: 1, scale: 1, duration: 0.9 },
+        { opacity: 1, scale: 1, duration: isMobile ? 0.6 : 0.9 },
         0
       );
 
       // Text block entrance
       tl.fromTo(
         textBlockRef.current?.querySelectorAll('.reveal-item') || [],
-        { y: 28, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.7, stagger: 0.08 },
-        0.2
+        { y: isMobile ? 20 : 28, opacity: 0 },
+        { y: 0, opacity: 1, duration: isMobile ? 0.5 : 0.7, stagger: isMobile ? 0.05 : 0.08 },
+        isMobile ? 0.1 : 0.2
       );
 
-      // Image card entrance
-      tl.fromTo(
-        imageCardRef.current,
-        { x: '10vw', opacity: 0, scale: 0.98 },
-        { x: 0, opacity: 1, scale: 1, duration: 0.85 },
-        0.3
-      );
-
-      // Bokeh orbs entrance
-      tl.fromTo(
-        [orb1Ref.current, orb2Ref.current, orb3Ref.current],
-        { opacity: 0 },
-        { opacity: 0.35, duration: 0.6, stagger: 0.1 },
-        0.5
-      );
+      // Image card entrance - skip on mobile
+      if (!isMobile) {
+        tl.fromTo(
+          imageCardRef.current,
+          { x: '10vw', opacity: 0, scale: 0.98 },
+          { x: 0, opacity: 1, scale: 1, duration: 0.85 },
+          0.3
+        );
+      } else {
+        gsap.set(imageCardRef.current, { opacity: 0, display: 'none' });
+      }
     }, sectionRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [isMobile, prefersReducedMotion]);
 
-  // Scroll-driven animation (pinned)
+  // Scroll-driven animation (pinned) - DISABLED on mobile
   useLayoutEffect(() => {
+    if (isMobile || prefersReducedMotion) return;
+
     const section = sectionRef.current;
     if (!section) return;
 
@@ -67,9 +92,8 @@ const HeroSection = () => {
           start: 'top top',
           end: '+=130%',
           pin: true,
-          scrub: 0.6,
+          scrub: isMobile ? false : 0.6,
           onLeaveBack: () => {
-            // Reset all elements to visible when scrolling back to top
             gsap.set(textBlockRef.current, { x: 0, opacity: 1 });
             gsap.set(imageCardRef.current, { x: 0, opacity: 1 });
             gsap.set(bgRef.current, { scale: 1, opacity: 1 });
@@ -101,7 +125,7 @@ const HeroSection = () => {
     }, section);
 
     return () => ctx.revert();
-  }, []);
+  }, [isMobile, prefersReducedMotion]);
 
   const scrollToWork = () => {
     const element = document.querySelector('#work');
@@ -120,65 +144,51 @@ const HeroSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="section-pinned z-[100] flex items-center justify-center"
+      className="relative w-full min-h-screen overflow-hidden flex items-center justify-center"
     >
       {/* Background Image */}
       <div
         ref={bgRef}
-        className="absolute inset-0 w-full h-full"
-        style={{ opacity: 0 }}
+        className="absolute inset-0 w-full h-full gpu-accelerate"
+        style={{ opacity: prefersReducedMotion ? 1 : 0 }}
       >
         <img
           src="/images/hero_city_bg.jpg"
           alt="City background"
           className="w-full h-full object-cover"
+          loading="eager"
+          decoding="async"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#070B14] via-[#070B14]/80 to-transparent" />
         <div className="absolute inset-0 bg-[#070B14]/40" />
       </div>
 
-      {/* Bokeh Orbs */}
-      <div
-        ref={orb1Ref}
-        className="bokeh-orb w-[300px] h-[300px] left-[45vw] top-[15vh] animate-drift"
-        style={{ opacity: 0 }}
-      />
-      <div
-        ref={orb2Ref}
-        className="bokeh-orb w-[200px] h-[200px] left-[70vw] top-[60vh] animate-drift-slow"
-        style={{ opacity: 0 }}
-      />
-      <div
-        ref={orb3Ref}
-        className="bokeh-orb w-[150px] h-[150px] left-[50vw] top-[70vh] animate-drift-slower"
-        style={{ opacity: 0 }}
-      />
-
-      {/* Content Container */}
-      <div className="relative z-10 w-full h-full flex items-center">
-        {/* Text Block (Left) */}
+      {/* Content Container - Mobile Optimized */}
+      <div className="relative z-10 w-full h-full flex items-center px-4 sm:px-6 lg:px-[7vw] py-20 sm:py-0">
+        {/* Text Block */}
         <div
           ref={textBlockRef}
-          className="absolute left-[7vw] top-[26vh] w-[38vw] max-w-[600px]"
+          className="w-full max-w-[600px] mx-auto lg:mx-0 lg:w-[38vw] text-center lg:text-left"
+          style={{ opacity: prefersReducedMotion ? 1 : 0 }}
         >
-          <span className="eyebrow reveal-item block mb-4">QUANTNOVA</span>
-          <h1 className="reveal-item text-[clamp(40px,4.5vw,72px)] font-bold text-[#F4F6FF] leading-[0.95] mb-6">
+          <span className="eyebrow reveal-item block mb-3 sm:mb-4">QUANTNOVA</span>
+          <h1 className="reveal-item text-[clamp(32px,8vw,72px)] sm:text-[clamp(36px,5vw,72px)] font-bold text-[#F4F6FF] leading-[0.95] mb-4 sm:mb-6">
             Intelligence,
             <br />
             <span className="text-gradient">engineered for results.</span>
           </h1>
-          <p className="reveal-item text-lg text-[#A7B1D8] leading-relaxed mb-8 max-w-[42ch]">
+          <p className="reveal-item text-base sm:text-lg text-[#A7B1D8] leading-relaxed mb-6 sm:mb-8 max-w-[42ch] mx-auto lg:mx-0">
             We design systems that think, adapt, and ship—so your teams can move
             faster with confidence.
           </p>
-          <div className="reveal-item flex flex-wrap items-center gap-4">
-            <button onClick={scrollToContact} className="btn-primary">
+          <div className="reveal-item flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+            <button onClick={scrollToContact} className="btn-primary w-full sm:w-auto">
               Book a discovery call
               <ArrowRight size={18} />
             </button>
             <button
               onClick={scrollToWork}
-              className="inline-flex items-center gap-1 text-[#A7B1D8] hover:text-[#4F6DFF] transition-colors"
+              className="inline-flex items-center justify-center gap-1 text-[#A7B1D8] hover:text-[#4F6DFF] transition-colors py-2"
             >
               View selected work
               <ChevronRight size={16} />
@@ -186,18 +196,27 @@ const HeroSection = () => {
           </div>
         </div>
 
-        {/* Image Card (Right) */}
+        {/* Image Card - Hidden on mobile, shown on lg+ */}
         <div
           ref={imageCardRef}
-          className="absolute left-[54vw] top-[22vh] w-[39vw] h-[56vh] max-w-[560px] max-h-[520px] rounded-[28px] overflow-hidden shadow-[0_24px_70px_rgba(0,0,0,0.45)]"
-          style={{ opacity: 0 }}
+          className="hidden lg:block absolute right-[7vw] top-1/2 -translate-y-1/2 w-[39vw] h-[56vh] max-w-[560px] max-h-[520px] rounded-[28px] overflow-hidden shadow-[0_24px_70px_rgba(0,0,0,0.45)] gpu-accelerate"
+          style={{ opacity: prefersReducedMotion ? 1 : 0 }}
         >
           <img
             src="/images/hero_ai_card.jpg"
             alt="AI Technology"
             className="w-full h-full object-cover"
+            loading="eager"
+            decoding="async"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#070B14]/60 via-transparent to-transparent" />
+        </div>
+      </div>
+
+      {/* Scroll indicator - subtle hint */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce hidden sm:block">
+        <div className="w-6 h-10 rounded-full border-2 border-[#A7B1D8]/30 flex items-start justify-center p-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#A7B1D8]/50" />
         </div>
       </div>
     </section>

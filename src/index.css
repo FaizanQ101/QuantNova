@@ -38,10 +38,15 @@
     scroll-behavior: smooth;
     /* Prevent horizontal scroll on mobile */
     overflow-x: hidden;
+    /* Allow vertical scroll */
+    overflow-y: auto;
     /* Optimize for mobile viewport */
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    /* Ensure html takes full height */
+    height: auto;
+    min-height: 100%;
   }
 
   body {
@@ -52,8 +57,11 @@
     overflow-x: hidden;
     /* Smooth scrolling for iOS */
     -webkit-overflow-scrolling: touch;
-    /* Prevent pull-to-refresh on mobile */
-    overscroll-behavior-y: none;
+    /* Allow normal scroll behavior - removed overscroll-behavior-y: none which was blocking scroll */
+    overscroll-behavior-y: auto;
+    /* Ensure body can scroll */
+    min-height: 100vh;
+    min-height: 100svh;
   }
 
   h1, h2, h3, h4, h5, h6 {

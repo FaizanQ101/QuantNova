@@ -1,4 +1,4 @@
-import { findRelevantDocuments, buildContext, type KnowledgeDocument } from '@/data/knowledgeBase';
+import { findRelevantDocuments, type KnowledgeDocument } from '@/data/knowledgeBase';
 
 export interface ChatMessage {
   id: string;
@@ -116,7 +116,9 @@ class ChatbotService {
     // Limit cache size
     if (responseCache.size > 100) {
       const firstKey = responseCache.keys().next().value;
-      responseCache.delete(firstKey);
+      if (firstKey) {
+        responseCache.delete(firstKey);
+      }
     }
   }
 

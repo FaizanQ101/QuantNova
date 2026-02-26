@@ -1,9 +1,9 @@
 export const CONFIG = {
-  // Kimi API Configuration (SERVER-SIDE ONLY)
+  // Gemini API Configuration (SERVER-SIDE ONLY)
   // Do not put API keys in client code. The app calls `/api/chat` (Vercel function) instead.
-  KIMI_API_BASE_URL: 'https://api.moonshot.cn/v1',
-  KIMI_MODEL: 'moonshot-v1-32k', // Options: moonshot-v1-8k, moonshot-v1-32k, moonshot-v1-128k
-  
+  GEMINI_API_BASE_URL: 'https://generativelanguage.googleapis.com/v1beta',
+  GEMINI_MODEL: 'gemini-1.5-flash', // Options: gemini-1.5-flash, gemini-1.5-pro, gemini-1.5-pro-latest
+
   // Chatbot Configuration
   CHATBOT: {
     MAX_CONTEXT_LENGTH: 4000,
@@ -11,7 +11,7 @@ export const CONFIG = {
     MAX_TOKENS: 1000,
     TOP_K_RETRIEVAL: 3,
   },
-  
+
   // Company Info
   COMPANY: {
     NAME: 'QuantNova',
@@ -20,4 +20,4 @@ export const CONFIG = {
   }
 };
 
-// The Kimi API key must be configured as a SERVER env var on Vercel: `KIMI_API_KEY`.
+// The Gemini API key must be configured as a SERVER env var on Vercel: `GEMINI_API_KEY`.

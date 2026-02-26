@@ -24,7 +24,7 @@ A modern website with RAG chatbot functionality, built with React + TypeScript +
    VITE_SUPABASE_URL=your_supabase_project_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
    # Server-side only (for /api/chat on Vercel)
-   KIMI_API_KEY=your_kimi_api_key
+   GEMINI_API_KEY=your_gemini_api_key
    ```
 
 3. Run the development server:

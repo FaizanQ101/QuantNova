@@ -67,7 +67,7 @@ This guide will walk you through deploying your website to Vercel and setting up
    |------|-------|
    | `VITE_SUPABASE_URL` | Your Supabase Project URL |
    | `VITE_SUPABASE_ANON_KEY` | Your Supabase anon/public key |
-   | `KIMI_API_KEY` | Your Moonshot/Kimi API key (server-side only) |
+   | `GEMINI_API_KEY` | Your Google Gemini API key (server-side only) |
 
 7. Click "Deploy"
 8. Wait for deployment to complete (usually 1-2 minutes)
@@ -119,6 +119,7 @@ To test locally:
    ```
    VITE_SUPABASE_URL=your_supabase_project_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   GEMINI_API_KEY=your_gemini_api_key
    ```
 
 2. Run `npm run dev`

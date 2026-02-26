@@ -1,14 +1,14 @@
 # Troubleshooting: Chatbot Running in Offline Mode
 
-If your chatbot is showing "offline mode" even after adding `KIMI_API_KEY` to Vercel, follow these steps:
+If your chatbot is showing "offline mode" even after adding `GEMINI_API_KEY` to Vercel, follow these steps:
 
 ## Step 1: Verify Environment Variable in Vercel
 
 1. Go to your Vercel project dashboard
 2. Navigate to **Settings** → **Environment Variables**
-3. Verify `KIMI_API_KEY` is set:
-   - **Key**: `KIMI_API_KEY` (no quotes, no spaces)
-   - **Value**: Your actual API key starting with `sk-`
+3. Verify `GEMINI_API_KEY` is set:
+   - **Key**: `GEMINI_API_KEY` (no quotes, no spaces)
+   - **Value**: Your actual API key starting with `AIza...`
    - **Environment**: Should be set for **Production** (and optionally Preview/Development)
 
 ## Step 2: Redeploy After Adding Environment Variables
@@ -28,7 +28,7 @@ OR push a new commit to trigger a new deployment.
 2. Look for `/api/chat` function
 3. Click on it to see logs
 4. Check for errors like:
-   - "Missing KIMI_API_KEY"
+   - "Missing GEMINI_API_KEY"
    - Any 500 errors
    - Network errors
 
@@ -45,10 +45,10 @@ Test if the API route is working:
 
 ## Step 5: Common Issues
 
-### Issue: "Missing KIMI_API_KEY server env var"
+### Issue: "Missing GEMINI_API_KEY server env var"
 
-**Solution**: 
-- Verify the env var name is exactly `KIMI_API_KEY` (case-sensitive)
+**Solution**:
+- Verify the env var name is exactly `GEMINI_API_KEY` (case-sensitive)
 - Make sure it's set for the correct environment (Production)
 - **Redeploy** after adding it
 
@@ -99,13 +99,13 @@ When testing the chatbot:
 4. Common errors:
    - `Failed to fetch` → API route not found or network error
    - `API error: 500` → Check Vercel function logs
-   - `Missing KIMI_API_KEY` → Environment variable not set
+   - `Missing GEMINI_API_KEY` → Environment variable not set
 
 ## Still Not Working?
 
 1. **Check Vercel Logs**: Go to your deployment → **Functions** → `/api/chat` → View logs
-2. **Verify API Key**: Make sure your Kimi API key is valid and active
-3. **Test Locally**: Add `KIMI_API_KEY` to `.env` file and test with `npm run dev`
+2. **Verify API Key**: Make sure your Gemini API key is valid and active
+3. **Test Locally**: Add `GEMINI_API_KEY` to `.env` file and test with `npm run dev`
 4. **Contact Support**: Share the error messages from Vercel logs
 
 ## Quick Test
@@ -117,8 +117,8 @@ curl -X POST https://your-site.vercel.app/api/chat \
   -H "Content-Type: application/json" \
   -d '{
     "messages": [{"role": "user", "content": "Hello"}],
-    "model": "moonshot-v1-8k"
+    "model": "gemini-1.5-flash"
   }'
 ```
 
-If you get an error about missing `KIMI_API_KEY`, the environment variable isn't set correctly.
+If you get an error about missing `GEMINI_API_KEY`, the environment variable isn't set correctly.

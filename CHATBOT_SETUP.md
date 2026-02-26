@@ -7,18 +7,18 @@ Your QuantNova website now includes a RAG (Retrieval-Augmented Generation) based
 ## Files Created
 
 1. **`src/data/knowledgeBase.ts`** - Contains all company information, services, case studies, and FAQs
-2. **`src/lib/config.ts`** - Configuration file with Kimi API settings
-3. **`src/lib/chatbotService.ts`** - RAG retrieval logic and Kimi API integration
+2. **`src/lib/config.ts`** - Configuration file with Gemini API settings
+3. **`src/lib/chatbotService.ts`** - RAG retrieval logic and Gemini API integration
 4. **`src/components/Chatbot.tsx`** - Chatbot UI component
 
-## Setting Up Kimi API
+## Setting Up Gemini API
 
 ### Step 1: Get Your API Key
 
-1. Visit [Kimi Platform](https://platform.moonshot.cn/)
-2. Create an account or log in
-3. Navigate to API Keys section
-4. Generate a new API key
+1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Sign in with your Google account
+3. Create a new API key
+4. Copy the key (starts with `AIza...`)
 
 ### Step 2: Update the Configuration
 
@@ -26,7 +26,7 @@ Open `src/lib/config.ts` and replace the placeholder:
 
 ```typescript
 export const CONFIG = {
-  // IMPORTANT: Never put KIMI_API_KEY in client code.
+  // IMPORTANT: Never put GEMINI_API_KEY in client code.
   // Configure it as a server environment variable on Vercel instead.
   // ... rest of config
 };
@@ -44,7 +44,7 @@ npm run build
 1. **User asks a question** → Chatbot receives the query
 2. **Document Retrieval** → System searches knowledge base for relevant documents based on keywords
 3. **Context Building** → Retrieved documents are combined into a context string
-4. **API Call** → Context + user query are sent to Kimi API
+4. **API Call** → Context + user query are sent to Gemini API
 5. **Response** → AI generates an answer based on the provided context
 
 ## Knowledge Base Contents
@@ -94,12 +94,12 @@ To add more information, edit `src/data/knowledgeBase.ts`:
 
 ### API errors
 - Verify your API key is valid
-- Check your Kimi API quota/billing
+- Check your Gemini API quota/billing
 - Review browser console for error details
 
 ## API Usage Notes
 
-- The chatbot uses the `moonshot-v1-8k` model by default
+- The chatbot uses the `gemini-1.5-flash` model by default
 - Each conversation includes the last 6 messages for context
 - Token usage depends on conversation length and knowledge context size
 
